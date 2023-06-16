@@ -206,7 +206,7 @@ footer {
 
 .formBoxLeftSignup {
   min-height: 500px;
-  background-image: url(images/ironman.png);
+  background-image: url(./images/ironman.png);
   background-repeat: no-repeat;
   background-position: center center;
   flex: 0 1 50%;
@@ -302,7 +302,7 @@ footer {
   display: block;
   margin: 0 auto 20px;
   min-width: 150px;
-  background-color: transparent;
+  background-color: var(--dark-red-color);
   color: var(--white-color);
   padding: 7px;
   font-size: 15px;
