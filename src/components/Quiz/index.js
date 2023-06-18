@@ -1,110 +1,115 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, { Component } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Levels from '../Levels'
 import ProgressBar from '../ProgressBar'
-import { QuizMarvel } from '../Questions'
-import QuizOver from '../QuizOver';
+import {QuizMarvel} from "../Questions"
+import QuiOver from '../QuizOver';
 
-const Quiz = (props) => {
-
-  const [levels, setLevels] = useState({
+class quiz extends Component {
+  
+  state = {
     levelNames: ["debutant", "confirme", "expert"],
     quizLevel: 0,
-    maxQuestions: 10,
-    storedQuestions: [],
-    question: "",
-    options: []
-  });
+    maxQuestion: 10,
+    storedQuestion: [],
+    question: null,
+    options: [],
+    idQuestion: 0,
+    btnDisabled: true,
+    userAnswer: null,
+    score: 0,
+    showWelcomeMsg: false,
+    quizEnd: false,
+    percent: null
+  }
 
-  const [idQuestoin, setIdQuestoin] = useState(0)
+  storedDataRef = React.createRef()
 
-  const [btnDisabled, setBtnDisabled] = useState(true);
-  const [userAnswer, setUserAnswer] = useState(null);
-  const [score, setScore] = useState(0);
-  const [quizEnd, setQuizEnd] = useState(false)
-  
-  const storedDataRef = useRef(null)
-  
-  const loadQuestion = (question) => {
-    const fetchedArrayQuiz = QuizMarvel[0].quizz[question]
-    if(fetchedArrayQuiz.length >= levels.maxQuestions) {
-      const newArray = fetchedArrayQuiz.map(({answer, ...keepRest})=> keepRest)
-      storedDataRef.current = fetchedArrayQuiz
-      setLevels({ ...levels,
-        storedQuestions: newArray,
-        question: newArray[idQuestoin],
-        options: newArray[idQuestoin].options
+  loadQuestion = (quizz)=>{
+   const fetchDataArray = QuizMarvel[0].quizz[quizz];
+   if(fetchDataArray.length >= this.state.maxQuestion) {
+
+      this.storedDataRef.current = fetchDataArray;
+      const newArray = fetchDataArray.map(({answer, ...keepRest}) => keepRest)
+
+      this.setState({
+        storedQuestion: newArray
+      })
+   } else {
+    console.log("Pas assez de questions")
+   }
+  }
+
+  componentDidMount() { 
+    this.loadQuestion(this.state.levelNames[this.state.quizLevel])
+   }
+
+   componentDidUpdate(prevProps, prevState) {
+    if (this.state.storedQuestion !== prevState.storedQuestion) {
+      this.setState({
+        question: this.state.storedQuestion[this.state.idQuestion].question,
+        options: this.state.storedQuestion[this.state.idQuestion].options
       });
-      
-     
-    } else {
-        console.log("Pas assez de questions!!!");
+    }
+
+    if(this.state.idQuestion !== prevState.idQuestion){
+      this.setState({
+        question: this.state.storedQuestion[this.state.idQuestion].question,
+        options: this.state.storedQuestion[this.state.idQuestion].options,
+        userAnswer: null,
+        btnDisabled: true
+      });
+    }
+
+    if(this.props.userData.pseudo) {
+      this.showWelcomeMsg(this.props.userData.pseudo)
     }
   }
 
-  const showWelcomeMsg = (content)=> {
-    toast.warn(`Bienvenue ${content} et bonne chance !`, {
+  showWelcomeMsg = (pseudo) =>{
+    if(!this.state.showWelcomeMsg) {
+      this.setState({
+        showWelcomeMsg: true
+      })
+
+      toast.warn(`Bienvenue ${pseudo} et bonne chance!`, {
       position: "top-right",
-      autoClose: 3000,
+      autoClose: 5000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
-      draggable: false, 
+      draggable: false,
       progress: undefined,
       theme: "colored",
       });
-  }
-
-  useEffect(() => {
-
-    loadQuestion(levels.levelNames[levels.quizLevel])
-    
-  }, [levels.levelNames, levels.quizLevel, idQuestoin]);
-
-  useEffect(() => {
-    
-    if(props.userData.pseudo){
-      showWelcomeMsg(props.userData.pseudo)
     }
-  }, [])
-  
- 
-
-
-  const submitAnswer = (select)=>{
-    setUserAnswer(select);
-    setBtnDisabled(false)
+    
   }
 
-  const options =levels.options.map((option, index)=>{
-      return (
-          <p
-            className={`answerOptions ${userAnswer === option && "selected"}`}
-            key={index}
-            onClick={ ()=>{submitAnswer(option)}}
-          >
-            {option}
-          </p>)
-  })
+  submitAnswer = (selectedAnswer) =>{
+    this.setState({
+      userAnswer: selectedAnswer,
+      btnDisabled: false
+    })
+  }
 
-  const nextQuestion = ()=>{
-    
-    if(idQuestoin === levels.maxQuestions -1 ){
-      // gameOver()
-      setQuizEnd(true)
-     setLevels({...levels, quizLevel: levels.quizLevel + 1})
-     setIdQuestoin(0)
+  nextQuestion = ()=>{
+    if(this.state.idQuestion === this.state.maxQuestion - 1) {
+        this.gameOver()
     } else {
-      setIdQuestoin(idQuestoin + 1)
+      this.setState(prevState =>({
+        idQuestion: prevState.idQuestion + 1
+      }))
     }
 
-    setBtnDisabled(true)
+    const goodAnswer = this.storedDataRef.current[this.state.idQuestion].answer;
+      if(this.state.userAnswer === goodAnswer) {
+        this.setState( prevState => ({
+          score: prevState.score + 1
+        }))
 
-    const goodAnswer = storedDataRef.current[idQuestoin].answer;
-    if(userAnswer === goodAnswer){
-        setScore(score + 1);
-        toast.success('Bravo ! +1', {
+        toast.success('Bravo +1 !', {
           position: "top-right",
           autoClose: 1500,
           hideProgressBar: false,
@@ -114,47 +119,89 @@ const Quiz = (props) => {
           progress: undefined,
           theme: "colored",
           });
-    } else if(userAnswer !== goodAnswer){
-      toast.error('Raté ! 0', {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        });
-    }
-    console.log(score);
+      } else {
+        toast.error('Raté 0 !', {
+          position: "top-right",
+          autoClose: 1500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          });
+      }
   }
 
-  // const gameOver = () =>{
-  //   setQuizEnd(true);
-  // }
+  getPercentage = (maxQuest, ourScore) => (ourScore / maxQuest) *100
 
-  // const resetScore = setScore(0)
-  return(
-    quizEnd ?
-    ( <QuizOver />)
-    :
-    <>
-        <Levels levels = {levels}/>
-        <ProgressBar idQuestoin = {idQuestoin}/>
-        <h2>{levels.question.question}</h2>
+  gameOver = () => {
 
-        {options}
+    const gradepercent = this.getPercentage(this.state.maxQuestion, this.state.score)
 
+    if(gradepercent >= 50) {
+      this.setState({
+        quizLevel: this.state.quizLevel + 1,
+        percent: gradepercent,
+        quizEnd: true
+      })
+    } else {
+      this.setState({
+        percent: gradepercent,
+        quizEnd: true
+      })
+    }
+
+    this.setState({
+      quizEnd: true
+    })
+  }
+  render() {
+
+    const displayOptions = this.state.options.map((option, index)=>{
+      return (
+              <p className={`answerOptions ${this.state.userAnswer === option && "selected"}`}
+                  key={index}
+                  onClick={()=> {this.submitAnswer(option)}}
+              >
+                    {option}
+              </p>
+              )
+     })
+
+     return this.state.quizEnd ? 
+        (
+          <QuiOver 
+            ref={this.storedDataRef}
+            levelNames={this.state.levelNames}
+            score={this.state.score}
+            maxQuestion={this.state.maxQuestion}
+            quizLevel={this.state.quizLevel}
+            percent={this.state.percent}
+          />
+        )
+      :
+        (
+          <div>
+        <Levels />
+        <ProgressBar 
+          idQuestoin={this.state.idQuestion}
+          maxQuestion={this.state.maxQuestion}
+        />
+        <h2>{this.state.question}</h2>
+        {displayOptions}
         <button
           className='btnSubmit'
-          disabled={btnDisabled}
-          onClick={nextQuestion}
+          disabled={this.state.btnDisabled}
+          onClick={this.nextQuestion}
         >
-          Suivant
+          
+          {this.state.idQuestion === this.state.maxQuestion - 1 ? "Terminer" : "Suivant"}
         </button>
         <ToastContainer />
-      </>
-    )
+      </div>
+        )
+  }
 }
 
-export default Quiz
+export default quiz
