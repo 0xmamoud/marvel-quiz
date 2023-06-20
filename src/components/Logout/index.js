@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react'
 import {useNavigate } from 'react-router-dom'
 import { auth } from '../Firebase/firebaseConfig';
 import { signOut } from 'firebase/auth';
+import { Tooltip } from 'react-tooltip'
+
 
 const Logout = () => {
 
@@ -36,9 +38,15 @@ const Logout = () => {
           checked={checked}
           onChange={handleChange}
         />
-        <span className='slider round'></span>
+        <span
+          className='slider round'
+          data-tooltip-id="tooltip id"
+          data-tooltip-content="DECONNEXION "
+          data-tooltip-place="left"
+        ></span>
       </label>
-
+      <Tooltip id="tooltip id" />
+      
     </div>
   )
 }

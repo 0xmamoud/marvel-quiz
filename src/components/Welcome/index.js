@@ -1,10 +1,11 @@
-import React, {useState, Fragment, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import Logout from '../Logout';
 import Quiz from '../Quiz';
 import { auth, user } from '../Firebase/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { getDoc } from 'firebase/firestore';
 import {useNavigate } from 'react-router-dom';
+import Loader from '../Loader';
 
 const Welcome = () => {
 
@@ -38,13 +39,12 @@ const Welcome = () => {
    
   }, [userSession, navigate])
 
-  // console.log(userData)
-
   return ( userSession === null ? 
-          <Fragment>
-            <div className='loader'></div>
-            <p>loading</p>
-          </Fragment> :
+            <Loader
+                loadingMsg={"Autantification ..."}
+                styling={{textAlign: "center", color: "#FFFFFF"}}
+            />
+            :
           <div className='quiz-bg'>
             <div className='container'>
               <Logout />
