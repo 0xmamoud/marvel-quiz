@@ -10,7 +10,6 @@ const Logout = () => {
   const navigate = useNavigate()
 
   const [checked, setChecked] = useState(false);
-  const [user, setUser] = useState(false)
 
   useEffect(() => {
       if(checked) {
@@ -22,7 +21,7 @@ const Logout = () => {
           // An error happened.
         });
       }
-  }, [checked])
+  }, [checked, navigate])
   
   const handleChange = (e) =>{
     setChecked(e.target.checked);

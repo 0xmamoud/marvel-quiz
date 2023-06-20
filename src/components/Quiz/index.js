@@ -165,11 +165,15 @@ class quiz extends Component {
 
     }
 
+    
   }
 
   loadLevelQuestions = param => {
-    this.setState({...this.initialState, quizLevel: param});
+    this.setState({ ...initialState, quizLevel: param });
+
     this.loadQuestion(levelNames[param])
+    
+     
   }
 
   render() {
@@ -209,6 +213,7 @@ class quiz extends Component {
             quizLevel={quizLevel}
             percent={percent}
             loadLevelQuestions={this.loadLevelQuestions}
+            
           />
         )
       :
