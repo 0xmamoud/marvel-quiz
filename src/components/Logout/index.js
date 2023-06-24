@@ -1,53 +1,46 @@
-import React, {useState, useEffect} from 'react'
-import {useNavigate } from 'react-router-dom'
-import { auth } from '../Firebase/firebaseConfig';
-import { signOut } from 'firebase/auth';
-import { Tooltip } from 'react-tooltip'
-
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../Firebase/firebaseConfig";
+import { signOut } from "firebase/auth";
+import { Tooltip } from "react-tooltip";
 
 const Logout = () => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-      if(checked) {
-        signOut(auth).then(() => {
+    if (checked) {
+      signOut(auth)
+        .then(() => {
           setTimeout(() => {
-            navigate("/")
+            navigate("/");
           }, 500);
-        }).catch((error) => {
+        })
+        .catch((error) => {
           // An error happened.
         });
-      }
-  }, [checked, navigate])
-  
-  const handleChange = (e) =>{
+    }
+  }, [checked, navigate]);
+
+  const handleChange = (e) => {
     setChecked(e.target.checked);
-
-  }
-
+  };
 
   return (
-    <div className='logoutContainer'>
-      <label className='switch'>
-        <input
-          type='checkbox'
-          checked={checked}
-          onChange={handleChange}
-        />
+    <div className="logoutContainer">
+      <label className="switch">
+        <input type="checkbox" checked={checked} onChange={handleChange} />
         <span
-          className='slider round'
+          className="slider round"
           data-tooltip-id="tooltip id"
           data-tooltip-content="DECONNEXION "
           data-tooltip-place="left"
         ></span>
       </label>
       <Tooltip id="tooltip id" />
-      
     </div>
-  )
-}
+  );
+};
 
-export default Logout
+export default Logout;

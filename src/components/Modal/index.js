@@ -1,14 +1,13 @@
-import React from 'react'
+import React from "react";
 
-const Modal = ({showModal, children}) => {
+const Modal = ({ showModal, children }) => {
   return (
-    showModal &&
-        <div className='modalBackground' >
-            <div className='modalContainer'>
-                {children}
-            </div>
-        </div>
-  )
-}
+    showModal && (
+      <div className="modalBackground">
+        <div className="modalContainer">{children}</div>
+      </div>
+    )
+  );
+};
 
-export default Modal
+export default Modal;
